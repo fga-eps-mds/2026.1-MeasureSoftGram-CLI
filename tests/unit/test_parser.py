@@ -74,3 +74,20 @@ def test_parser_calculate():
     assert args.extracted_path == Path("/path/to/extracted")
     assert args.config_path == Path("/path/to/config")
     assert args.output_format == "csv"
+
+
+def test_calculate_help_lists_accepted_formats():
+    """Regression: calculate --help must advertise the formats that argparse
+    actually accepts in `choices`, not a stale list that triggers an
+    invalid-choice error when the user follows the help."""
+    parser = create_parser()
+    help_text = parser.format_help()
+    for action in parser._actions:
+        if getattr(action, "dest", None) == "command" and hasattr(action, "choices"):
+            sub = action.choices.get("calculate")
+            if sub is not None:
+                help_text = sub.format_help()
+                break
+    for fmt in ("csv", "json"):
+        assert fmt in help_text
+    assert "tabular" not in help_text

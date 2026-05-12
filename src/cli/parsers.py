@@ -210,7 +210,7 @@ def create_parser():
         default="csv",
         help=(
             "The format of the output (export) values are: "
-            + ", ".join(SUPPORTED_FORMATS)
+            + ", ".join(AVAILABLE_GEN_FORMATS)
         ),
     )
     parser_calculate.set_defaults(func=command_calculate)  # function command calculate
@@ -272,7 +272,10 @@ def create_parser():
         "--output_format",
         type=str,
         choices=AVAILABLE_GEN_FORMATS,
-        help=("The format of the output (export) values is tabular"),
+        help=(
+            "The format of the output (export) values are: "
+            + ", ".join(AVAILABLE_GEN_FORMATS)
+        ),
     )
     parser_calculate.set_defaults(func=command_diff)
 
