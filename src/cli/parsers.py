@@ -11,7 +11,6 @@ from src.cli.commands.cmd_list import command_list
 from src.cli.commands.cmd_norm_diff import command_norm_diff
 
 from src.config.settings import (
-    SUPPORTED_FORMATS,
     DEFAULT_CONFIG_PATH,
     AVAILABLE_GEN_FORMATS,
 )
