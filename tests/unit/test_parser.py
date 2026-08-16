@@ -5,6 +5,7 @@ from src.cli.commands.cmd_calculate import command_calculate
 from src.cli.commands.cmd_list import command_list
 
 from src.cli.parsers import create_parser
+from src.config.settings import AVAILABLE_GEN_FORMATS
 
 
 def mock_command_init(args):
@@ -77,9 +78,9 @@ def test_parser_calculate():
 
 
 def test_calculate_help_lists_accepted_formats():
-    """Regression: calculate --help must advertise the formats that argparse
-    actually accepts in `choices`, not a stale list that triggers an
-    invalid-choice error when the user follows the help."""
+    """calculate --help must advertise the formats argparse actually accepts
+    in `choices`, not a shorter stale list that leads users into an
+    invalid-choice error."""
     parser = create_parser()
     help_text = parser.format_help()
     for action in parser._actions:
@@ -88,6 +89,22 @@ def test_calculate_help_lists_accepted_formats():
             if sub is not None:
                 help_text = sub.format_help()
                 break
-    for fmt in ("csv", "json"):
+    for fmt in AVAILABLE_GEN_FORMATS:
         assert fmt in help_text
-    assert "tabular" not in help_text
+
+
+def test_parser_calculate_tabular():
+    parser = create_parser()
+    args = parser.parse_args(
+        [
+            "calculate",
+            "-ep",
+            "/path/to/extracted",
+            "-cp",
+            "/path/to/config",
+            "-o",
+            "tabular",
+        ]
+    )
+    assert args.func == command_calculate
+    assert args.output_format == "tabular"
