@@ -5,6 +5,7 @@ from src.cli.commands.cmd_calculate import command_calculate
 from src.cli.commands.cmd_list import command_list
 
 from src.cli.parsers import create_parser
+from src.config.settings import AVAILABLE_GEN_FORMATS
 
 
 def mock_command_init(args):
@@ -74,6 +75,22 @@ def test_parser_calculate():
     assert args.extracted_path == Path("/path/to/extracted")
     assert args.config_path == Path("/path/to/config")
     assert args.output_format == "csv"
+
+
+def test_calculate_help_lists_accepted_formats():
+    """calculate --help must advertise the formats argparse actually accepts
+    in `choices`, not a shorter stale list that leads users into an
+    invalid-choice error."""
+    parser = create_parser()
+    help_text = parser.format_help()
+    for action in parser._actions:
+        if getattr(action, "dest", None) == "command" and hasattr(action, "choices"):
+            sub = action.choices.get("calculate")
+            if sub is not None:
+                help_text = sub.format_help()
+                break
+    for fmt in AVAILABLE_GEN_FORMATS:
+        assert fmt in help_text
 
 
 def test_parser_calculate_tabular():
