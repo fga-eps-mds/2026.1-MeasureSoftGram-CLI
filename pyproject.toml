@@ -48,3 +48,6 @@ dev = ["pytest", "pytest-cov", "setuptools", "wheel"]
 
 [tool.setuptools.packages]
 find = {}
+
+[tool.setuptools.package-data]
+"src.cli.examples" = ["**/*.json", "README.md"]
