@@ -1,3 +1,4 @@
+import importlib.resources as resources
 import logging
 import sys
 from pathlib import Path
@@ -16,28 +17,26 @@ from src.cli.utils import (
 
 logger = logging.getLogger("msgram")
 
-# Directory name of the embedded sample dataset shipped with the repository.
-EXAMPLES_DIRNAME = "examples"
+# Package that ships the sample dataset as package data (see pyproject.toml).
+EXAMPLES_PACKAGE = "src.cli.examples"
 RAW_DATA_DIRNAME = "analytics-raw-data"
 DEFAULT_DEMO_OUTPUT = Path.cwd() / "msgram-demo"
 
 
 def find_raw_data_dir() -> Path:
-    """Locate the embedded sample dataset.
+    """Locate the sample dataset shipped inside the package.
 
-    The lookup is done relative to this module (not the current working
-    directory) so the demo keeps working when the CLI is installed and run
-    from outside the repository. We walk up the parents of this file looking
-    for `examples/analytics-raw-data`.
+    The dataset is resolved as a package resource, not as a path relative to
+    the repository, so the demo keeps working when the CLI is installed from
+    PyPI and run from anywhere.
     """
-    for parent in Path(__file__).resolve().parents:
-        candidate = parent / EXAMPLES_DIRNAME / RAW_DATA_DIRNAME
-        if candidate.is_dir() and any(candidate.glob("*.json")):
-            return candidate
+    candidate = Path(str(resources.files(EXAMPLES_PACKAGE))) / RAW_DATA_DIRNAME
+    if candidate.is_dir() and any(candidate.glob("*.json")):
+        return candidate
 
     raise FileNotFoundError(
-        f"Could not find the embedded sample dataset '{EXAMPLES_DIRNAME}/"
-        f"{RAW_DATA_DIRNAME}' with a Sonar JSON file."
+        f"Could not find the sample dataset '{RAW_DATA_DIRNAME}' with a Sonar "
+        f"JSON file inside the package '{EXAMPLES_PACKAGE}'."
     )
 
 
